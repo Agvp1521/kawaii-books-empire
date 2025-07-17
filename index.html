@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 Kawaii Books Empire</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#8b5cf6">
+    <meta name="description" content="Sistema mágico para crear libros kawaii y generar $2,000+ mensuales">
+    <link rel="manifest" href="#" id="manifest-placeholder">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .glass {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .glass:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .achievement-popup {
+            animation: slideInRight 0.5s ease-out, fadeOut 0.5s ease-in 2.5s;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .active-tab {
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+        }
+        
+        .tab-btn {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .tab-btn:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0.5rem;
+            }
+            
+            .text-6xl {
+                font-size: 2.5rem;
+            }
+            
+            .grid-cols-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        /* Hide scrollbars */
+        .overflow-y-auto::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .overflow-y-auto::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        
+        .overflow-y-auto::-webkit-scrollbar-thumb {
+            background: rgba(139, 92, 246, 0.6);
+            border-radius: 3px;
+        }
+        
+        .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+            background: rgba(139, 92, 246, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="min-h-screen relative overflow-hidden">
+        <!-- Background Effects -->
+        <div class="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-cyan-900"></div>
+        <div class="absolute inset-0 opacity-30">
+            <div class="absolute top-10 left-10 w-20 h-20 bg-pink-500 rounded-full blur-xl floating"></div>
+            <div class="absolute top-40 right-20 w-32 h-32 bg-cyan-500 rounded-full blur-xl floating" style="animation-delay: 1s;"></div>
+            <div class="absolute bottom-20 left-20 w-24 h-24 bg-yellow-500 rounded-full blur-xl floating" style="animation-delay: 2s;"></div>
+        </div>
+        
+        <div class="relative z-10 container mx-auto px-4 py-8">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-4xl md:text-6xl font-bold gradient-text mb-4 animate-pulse">
+                    🎨 Kawaii Books Empire
+                </h1>
+                <p class="text-lg md:text-xl text-white/80">
+                    ✨ Sistema Mágico para $2,000+ Mensuales ✨
+                </p>
+                <div class="flex flex-col md:flex-row justify-center gap-4 mt-6">
+                    <button onclick="showIdeaModal()" class="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-6 py-3 rounded-full font-bold hover:scale-105 transition-all shadow-lg flex items-center justify-center gap-2">
+                        <i data-lucide="lightbulb"></i>
+                        💡 Banco de Ideas
+                    </button>
+                    <button onclick="showCalendarModal()" class="bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-6 py-3 rounded-full font-bold hover:scale-105 transition-all shadow-lg flex items-center justify-center gap-2">
+                        <i data-lucide="calendar"></i>
+                        📅 Calendario de Lanzamientos
+                    </button>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <div class="flex justify-center mb-8">
+                <div class="glass rounded-2xl p-2 shadow-2xl">
+                    <button onclick="setActiveTab('dashboard')" class="tab-btn active-tab px-6 py-3 rounded-xl font-bold transition-all duration-300" data-tab="dashboard">
+                        <i data-lucide="trending-up" class="w-5 h-5 inline mr-2"></i>
+                        Dashboard
+                    </button>
+                    <button onclick="setActiveTab('schedule')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all duration-300" data-tab="schedule">
+                        <i data-lucide="calendar" class="w-5 h-5 inline mr-2"></i>
+                        Cronograma
+                    </button>
+                    <button onclick="setActiveTab('books')" class="tab-btn px-6 py-3 rounded-xl font-bold transition-all duration-300" data-tab="books">
+                        <i data-lucide="book-open" class="w-5 h-5 inline mr-2"></i>
+                        Libros
+                    </button>
+                </div>
+            </div>
+
+            <!-- Content Sections -->
+            <div id="dashboard-content" class="tab-content">
+                <!-- Metrics Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
+                    <div class="glass rounded-2xl p-4 md:p-6 text-center hover:scale-105 transition-all">
+                        <div id="progress-percentage" class="text-3xl md:text-5xl font-bold gradient-text mb-2">0%</div>
+                        <div class="text-white/80 font-medium text-sm">Progreso General</div>
+                        <div class="w-full bg-white/20 rounded-full h-2 mt-3">
+                            <div id="progress-bar" class="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="glass rounded-2xl p-4 md:p-6 text-center hover:scale-105 transition-all">
+                        <div id="total-designs" class="text-3xl md:text-5xl font-bold text-cyan-400 mb-2">0</div>
+                        <div class="text-white/80 font-medium text-sm">Diseños Completados</div>
+                        <div id="designs-percentage" class="text-cyan-300 text-xs mt-1">✨ 0% del total</div>
+                    </div>
+                    
+                    <div class="glass rounded-2xl p-4 md:p-6 text-center hover:scale-105 transition-all">
+                        <div id="completed-books" class="text-3xl md:text-5xl font-bold text-green-400 mb-2">0</div>
+                        <div class="text-white/80 font-medium text-sm">Libros Completados</div>
+                        <div class="text-green-300 text-xs mt-1">📚 de 6 libros totales</div>
+                    </div>
+                    
+                    <div class="glass rounded-2xl p-4 md:p-6 text-center hover:scale-105 transition-all">
+                        <div id="total-income" class="text-3xl md:text-5xl font-bold text-yellow-400 mb-2">$0</div>
+                        <div class="text-white/80 font-medium text-sm">Ingresos Reales</div>
+                        <div class="text-yellow-300 text-xs mt-1">🎯 Meta: $2,000/mes</div>
+                    </div>
+                </div>
+
+                <!-- Achievements -->
+                <div class="glass rounded-2xl p-6 mb-8">
+                    <h3 class="text-xl md:text-2xl font-bold text-white mb-6 flex items-center">
+                        <i data-lucide="trophy" class="w-6 h-6 mr-3 text-yellow-400"></i>
+                        🏆 Logros Desbloqueados
+                    </h3>
+                    <div id="achievements-grid" class="grid grid-cols-3 md:grid-cols-5 gap-4">
+                        <!-- Achievements will be generated here -->
+                    </div>
+                </div>
+
+                <!-- Timer and Stats -->
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <!-- Timer Widget -->
+                    <div class="glass rounded-2xl p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-xl font-bold text-white flex items-center">
+                                <i data-lucide="clock" class="w-6 h-6 mr-2 text-orange-500"></i>
+                                Timer de Trabajo
+                            </h3>
+                            <div class="flex space-x-2">
+                                <button onclick="toggleTimer()" id="timer-play-btn" class="bg-gradient-to-r from-green-500 to-emerald-500 text-white p-3 rounded-full hover:scale-110 transition-all shadow-lg">
+                                    <i data-lucide="play" class="w-5 h-5"></i>
+                                </button>
+                                <button onclick="startPomodoro()" class="bg-gradient-to-r from-orange-500 to-red-500 text-white p-3 rounded-full hover:scale-110 transition-all shadow-lg" title="Pomodoro (25min)">
+                                    <i data-lucide="coffee" class="w-5 h-5"></i>
+                                </button>
+                                <button onclick="resetTimer()" class="bg-gradient-to-r from-gray-500 to-gray-600 text-white p-3 rounded-full hover:scale-110 transition-all shadow-lg">
+                                    <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <div id="timer-display" class="text-4xl md:text-5xl font-mono font-bold mb-4 text-purple-600">00:00:00</div>
+                            <div id="timer-mode" class="text-sm font-medium mb-2 text-purple-600 hidden"></div>
+                            <div id="current-task-display" class="text-sm text-gray-300 glass rounded-lg p-2 hidden">
+                                Trabajando en: <span id="current-task-name"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Stats -->
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                            <i data-lucide="bar-chart-3" class="w-6 h-6 mr-2 text-cyan-400"></i>
+                            📊 Stats Rápidas
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-white/80">Racha actual:</span>
+                                <span id="current-streak" class="text-orange-400 font-bold text-xl flex items-center">
+                                    <i data-lucide="flame" class="w-4 h-4 mr-1"></i>
+                                    0 días
+                                </span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-white/80">Horas totales:</span>
+                                <span id="total-hours" class="text-purple-400 font-bold text-xl">0h</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-white/80">Promedio por día:</span>
+                                <span id="avg-hours" class="text-cyan-400 font-bold text-xl">0h</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-white/80">Diseños por hora:</span>
+                                <span id="designs-per-hour" class="text-green-400 font-bold text-xl">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Books Progress Summary -->
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="text-xl md:text-2xl font-bold text-white mb-6 flex items-center">
+                        <i data-lucide="book-open" class="w-6 h-6 mr-3 text-green-400"></i>
+                        📚 Estado de Libros
+                    </h3>
+                    <div id="books-summary" class="space-y-4">
+                        <!-- Books summary will be generated here -->
+                    </div>
+                </div>
+            </div>
+
+            <div id="schedule-content" class="tab-content hidden">
+                <div id="schedule-container" class="space-y-8">
+                    <!-- Schedule days will be generated here -->
+                </div>
+            </div>
+
+            <div id="books-content" class="tab-content hidden">
+                <div id="books-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Book cards will be generated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Achievement Notification -->
+    <div id="achievement-notification" class="fixed top-4 right-4 z-50 bg-gradient-to-r from-yellow-400 to-orange-500 text-white p-4 rounded-2xl shadow-2xl achievement-popup hidden">
+        <div class="flex items-center space-x-3">
+            <i data-lucide="trophy" class="w-6 h-6 text-yellow-200"></i>
+            <div>
+                <div id="achievement-name" class="font-bold text-lg"></div>
+                <div id="achievement-description" class="text-sm opacity-90"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Celebration Modal -->
+    <div id="celebration-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur hidden">
+        <div class="bg-gradient-to-br from-purple-600 to-pink-600 text-white p-8 rounded-3xl shadow-2xl text-center max-w-md animate-pulse">
+            <div class="text-6xl mb-4">🎉</div>
+            <h2 class="text-3xl font-bold mb-2">¡FELICIDADES!</h2>
+            <p class="text-lg mb-6">¡Has completado tu Imperio Kawaii!</p>
+            <p class="text-sm opacity-90 mb-6">Eres oficialmente una Empresaria Kawaii 👑</p>
+            <button onclick="hideCelebration()" class="bg-white text-purple-600 px-6 py-3 rounded-full font-bold hover:scale-105 transition-all">
+                ¡Increíble! ✨
+            </button>
+        </div>
+    </div>
+
+    <!-- Idea Bank Modal -->
+    <div id="idea-modal" class="fixed inset-0 z-40 flex items-center justify-center bg-black/50 backdrop-blur p-4 hidden">
+        <div class="glass rounded-3xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
+            <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-bold flex items-center">
+                        <i data-lucide="lightbulb" class="w-6 h-6 mr-3"></i>
+                        💡 Banco de Ideas Kawaii
+                    </h2>
+                    <button onclick="hideIdeaModal()" class="bg-white/20 hover:bg-white/30 p-2 rounded-full transition-all">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="p-6 max-h-96 overflow-y-auto bg-white/95">
+                <div class="mb-6">
+                    <div class="flex space-x-2">
+                        <input type="text" id="new-idea-input" placeholder="Escribe tu nueva idea kawaii..." class="flex-1 p-3 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <button onclick="addIdea()" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-lg hover:scale-105 transition-all">
+                            <i data-lucide="plus" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="ideas-list" class="space-y-3">
+                    <!-- Ideas will be generated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Modal -->
+    <div id="calendar-modal" class="fixed inset-0 z-40 flex items-center justify-center bg-black/50 backdrop-blur p-4 hidden">
+        <div class="glass rounded-3xl shadow-2xl w-full max-w-4xl max-h-[80vh] overflow-hidden">
+            <div class="bg-gradient-to-r from-cyan-600 to-blue-600 text-white p-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-bold flex items-center">
+                        <i data-lucide="calendar" class="w-6 h-6 mr-3"></i>
+                        📅 Calendario de Lanzamientos
+                    </h2>
+                    <button onclick="hideCalendarModal()" class="bg-white/20 hover:bg-white/30 p-2 rounded-full transition-all">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="p-6 max-h-96 overflow-y-auto bg-white/95">
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-gradient-to-r from-cyan-50 to-blue-50 p-4 rounded-lg border border-cyan-200">
+                        <h3 class="font-bold text-cyan-800 mb-3">➕ Agregar Libro Futuro</h3>
+                        <div class="space-y-3">
+                            <input type="text" id="future-book-title" placeholder="Título del libro" class="w-full p-2 border border-cyan-300 rounded focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                            <input type="date" id="future-book-date" class="w-full p-2 border border-cyan-300 rounded focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                            <input type="text" id="future-book-niche" placeholder="Nicho/Categoría" class="w-full p-2 border border-cyan-300 rounded focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                            <textarea id="future-book-description" placeholder="Descripción personalizada" class="w-full p-2 border border-cyan-300 rounded resize-none h-20 focus:outline-none focus:ring-2 focus:ring-cyan-500"></textarea>
+                            <button onclick="addFutureBook()" class="w-full bg-gradient-to-r from-cyan-500 to-blue-500 text-white p-2 rounded hover:scale-105 transition-all">
+                                Agregar Libro
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg border border-purple-200">
+                        <h3 class="font-bold text-purple-800 mb-3">🎯 Próximos Lanzamientos</h3>
+                        <div id="future-books-list" class="space-y-3 max-h-64 overflow-y-auto">
+                            <!-- Future books will be generated here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-lg border border-yellow-200">
+                    <h3 class="font-bold text-orange-800 mb-3">🎪 Fechas Estacionales Importantes</h3>
+                    <div class="grid md:grid-cols-3 gap-4 text-sm">
+                        <div class="bg-white p-3 rounded">
+                            <div class="font-semibold text-orange-700">🎃 Halloween 2025</div>
+                            <div class="text-gray-600">Octubre - Noviembre</div>
+                            <div class="text-xs mt-1">Spooks, vampiros, fantasmas kawaii</div>
+                        </div>
+                        <div class="bg-white p-3 rounded">
+                            <div class="font-semibold text-red-700">💕 San Valentín 2026</div>
+                            <div class="text-gray-600">Enero - Febrero</div>
+                            <div class="text-xs mt-1">Amor, corazones, cupidos kawaii</div>
+                        </div>
+                        <div class="bg-white p-3 rounded">
+                            <div class="font-semibold text-green-700">🐰 Pascua 2026</div>
+                            <div class="text-gray-600">Marzo - Abril</div>
+                            <div class="text-xs mt-1">Conejos, huevos, flores kawaii</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Install PWA Button -->
+    <button id="install-button" class="fixed bottom-4 right-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-full font-bold shadow-2xl hover:scale-110 transition-all hidden z-50">
+        📱 Instalar App
+    </button>
+
+    <script>
+        // Global state
+        let state = {
+            activeTab: 'dashboard',
+            tasks: {},
+            books: {},
+            timer: { isRunning: false, seconds: 0, currentTask: null, pomodoroMode: false, breakTime: false },
+            metrics: { totalDesigns: 0, completedBooks: 0, currentIncome: 0, dailyHours: 0, streak: 0, totalHours: 0 },
+            notes: {},
+            achievements: [],
+            ideaBank: [],
+            futureBooks: [],
+            realSales: {}
+        };
+
+        // Initial data
+        const initialBooks = {
+            'libro1': { name: 'Cute Kawaii Creatures', price: 11.99, target: 100, completed: 0, designs: 0, totalDesigns: 50, sales: 0 },
+            'libro2': { name: 'Christmas Kawaii Magic', price: 12.99, target: 150, completed: 0, designs: 0, totalDesigns: 50, sales: 0 },
+            'libro3': { name: 'Ocean Kawaii Babies', price: 10.99, target: 80, completed: 0, designs: 0, totalDesigns: 50, sales: 0 },
+            'libro4': { name: 'Space Kawaii Adventures', price: 11.99, target: 70, completed: 0, designs: 0, totalDesigns: 50, sales: 0 },
+            'libro5': { name: 'Garden Kawaii Friends', price: 10.99, target: 60, completed: 0, designs: 0, totalDesigns: 50, sales: 0 },
+            'libro6': { name: 'Food Kawaii Party', price: 9.99, target: 90, completed: 0, designs: 0, totalDesigns: 50, sales: 0 }
+        };
+
+        const initialIdeas = [
+            '🎃 Halloween Kawaii Spooks - Fantasmas y calabazas adorables',
+            '💕 Valentine Kawaii Love - Corazones y cupidos tiernos',
+            '🐰 Easter Kawaii Bunnies - Conejos y huevos pascuales',
+            '🦄 Unicorn Kawaii Dreams - Unicornios mágicos y arcoíris',
+            '🍰 Bakery Kawaii Sweets - Pasteles y dulces kawaii',
+            '🚗 Transport Kawaii Fun - Carros, aviones y trenes kawaii',
+            '🏠 Home Kawaii Living - Objetos del hogar adorables',
+            '🎭 Emotions Kawaii Faces - Expresiones kawaii variadas'
+        ];
+
+        const achievementsList = [
+            { id: 'first_task', name: '🎯 Primera Tarea', description: 'Completaste tu primera tarea', unlocked: false },
+            { id: 'first_day', name: '📅 Primer Día', description: 'Completaste todas las tareas de un día', unlocked: false },
+            { id: 'design_master', name: '🎨 Maestro del Diseño', description: 'Creaste 50 diseños', unlocked: false },
+            { id: 'book_creator', name: '📚 Creador de Libros', description: 'Completaste tu primer libro', unlocked: false },
+            { id: 'streak_3', name: '🔥 Racha de 3', description: 'Trabajaste 3 días seguidos', unlocked: false },
+            { id: 'streak_7', name: '⚡ Semana Completa', description: 'Trabajaste 7 días seguidos', unlocked: false },
+            { id: 'speed_demon', name: '🚀 Demonio de Velocidad', description: 'Completaste 10 tareas en un día', unlocked: false },
+            { id: 'income_500', name: '💰 Primera Meta', description: 'Alcanzaste $500 en ingresos', unlocked: false },
+            { id: 'income_1000', name: '🏆 Milestone $1K', description: 'Alcanzaste $1,000 en ingresos', unlocked: false },
+            { id: 'empire_builder', name: '👑 Constructor de Imperio', description: 'Completaste los 6 libros', unlocked: false }
+        ];
+
+        const schedule = {
+            1: {
+                date: 'Día 1',
+                title: 'Producción Masiva Libro 1',
+                tasks: [
+                    { id: 't1_1', name: 'Criaturas Cloud Friends (15 diseños)', duration: '3h', status: 'pending', bookId: 'libro1', designs: 15 },
+                    { id: 't1_2', name: 'Criaturas Food Babies (15 diseños)', duration: '3h', status: 'pending', bookId: 'libro1', designs: 15 },
+                    { id: 't1_3', name: 'Criaturas Crystal Pets (10 diseños)', duration: '3h', status: 'pending', bookId: 'libro1', designs: 10 }
+                ]
+            },
+            2: {
+                date: 'Día 2',
+                title: 'Finalización Libro 1 + Setup KDP',
+                tasks: [
+                    { id: 't2_1', name: 'Space Babies (10 diseños finales)', duration: '3h', status: 'pending', bookId: 'libro1', designs: 10 },
+                    { id: 't2_2', name: 'Creación de Portada en Canva', duration: '2h', status: 'pending', bookId: 'libro1', designs: 0 },
+                    { id: 't2_3', name: 'Setup Amazon KDP', duration: '2h', status: 'pending', bookId: 'libro1', designs: 0 }
+                ]
+            },
+            3: {
+                date: 'Día 3',
+                title: 'Publicación + Inicio Libro 2',
+                tasks: [
+                    { id: 't3_1', name: 'Publicación Final Libro 1', duration: '2h', status: 'pending', bookId: 'libro1', designs: 0 },
+                    { id: 't3_2', name: 'Investigación Navideña', duration: '1h', status: 'pending', bookId: 'libro2', designs: 0 },
+                    { id: 't3_3', name: 'Producción Libro 2 (25 diseños)', duration: '5h', status: 'pending', bookId: 'libro2', designs: 25 }
+                ]
+            },
+            4: {
+                date: 'Día 4',
+                title: 'Completar Libro 2 - Parte 1',
+                tasks: [
+                    { id: 't4_1', name: 'Completar 25 diseños navideños', duration: '5h', status: 'pending', bookId: 'libro2', designs: 25 },
+                    { id: 't4_2', name: 'Crear portada navideña premium', duration: '2h', status: 'pending', bookId: 'libro2', designs: 0 },
+                    { id: 't4_3', name: 'Optimizar título y keywords', duration: '1h', status: 'pending', bookId: 'libro2', designs: 0 }
+                ]
+            },
+            5: {
+                date: 'Día 5',
+                title: 'Completar Libro 2 - Parte 2',
+                tasks: [
+                    { id: 't5_1', name: 'Formatear libro navideño', duration: '2h', status: 'pending', bookId: 'libro2', designs: 0 },
+                    { id: 't5_2', name: 'Setup KDP para libro navideño', duration: '2h', status: 'pending', bookId: 'libro2', designs: 0 },
+                    { id: 't5_3', name: 'Publicar Christmas Kawaii Magic', duration: '1h', status: 'pending', bookId: 'libro2', designs: 0 }
+                ]
+            },
+            6: {
+                date: 'Día 6',
+                title: 'Inicio Libro 3',
+                tasks: [
+                    { id: 't6_1', name: 'Planificar Ocean Kawaii Babies', duration: '1h', status: 'pending', bookId: 'libro3', designs: 0 },
+                    { id: 't6_2', name: 'Crear 25 diseños marinos kawaii', duration: '5h', status: 'pending', bookId: 'libro3', designs: 25 },
+                    { id: 't6_3', name: 'Configurar promociones libros 1 y 2', duration: '1h', status: 'pending', bookId: null, designs: 0 }
+                ]
+            },
+            7: {
+                date: 'Día 7',
+                title: 'Finalizar Libro 3',
+                tasks: [
+                    { id: 't7_1', name: 'Completar 25 diseños oceánicos', duration: '4h', status: 'pending', bookId: 'libro3', designs: 25 },
+                    { id: 't7_2', name: 'Crear portada oceánica', duration: '2h', status: 'pending', bookId: 'libro3', designs: 0 },
+                    { id: 't7_3', name: 'Análisis de performance inicial', duration: '1h', status: 'pending', bookId: null, designs: 0 }
+                ]
+            }
+        };
+
+        // Timer variables
+        let timerInterval = null;
+
+        // Initialize app
+        function initApp() {
+            loadData();
+            initializeLucideIcons();
+            renderAll();
+            setupPWA();
+            startPeriodicSave();
+        }
+
+        // Initialize Lucide icons
+        function initializeLucideIcons() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+
+        // Load data from localStorage
+        function loadData() {
+            const savedData = localStorage.getItem('kawaiiBookTracker');
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    state.tasks = data.tasks || {};
+                    state.books = data.books || initialBooks;
+                    state.metrics = data.metrics || state.metrics;
+                    state.notes = data.notes || {};
+                    state.achievements = data.achievements || achievementsList;
+                    state.ideaBank = data.ideaBank || initialIdeas;
+                    state.futureBooks = data.futureBooks || [];
+                    state.realSales = data.realSales || {};
+                } catch (error) {
+                    console.log('Error loading saved data:', error);
+                    initializeDefaults();
+                }
+            } else {
+                initializeDefaults();
+            }
+        }
+
+        function initializeDefaults() {
+            const initialTasks = {};
+            Object.values(schedule).forEach(day => {
+                day.tasks.forEach(task => {
+                    initialTasks[task.id] = { ...task };
+                });
+            });
+            state.tasks = initialTasks;
+            state.books = { ...initialBooks };
+            state.achievements = [...achievementsList];
+            state.ideaBank = [...initialIdeas];
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            const dataToSave = {
+                tasks: state.tasks,
+                books: state.books,
+                metrics: state.metrics,
+                notes: state.notes,
+                achievements: state.achievements,
+                ideaBank: state.ideaBank,
+                futureBooks: state.futureBooks,
+                realSales: state.realSales
+            };
+            try {
+                localStorage.setItem('kawaiiBookTracker', JSON.stringify(dataToSave));
+            } catch (error) {
+                console.log('Error saving data:', error);
+            }
+        }
+
+        // Auto-save every 30 seconds
+        function startPeriodicSave() {
+            setInterval(saveData, 30000);
+        }
+
+        // Tab management
+        function setActiveTab(tabName) {
+            state.activeTab = tabName;
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active-tab');
+                btn.classList.add('text-white/70');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active-tab');
+            document.querySelector(`[data-tab="${tabName}"]`).classList.remove('text-white/70');
+            
+            // Show/hide content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(`${tabName}-content`).classList.remove('hidden');
+            
+            // Render specific content
+            if (tabName === 'schedule') renderSchedule();
+            else if (tabName === 'books') renderBooks();
+            
+            saveData();
+        }
+
+        // Utility functions
+        function formatTime(seconds) {
+            const hrs = Math.floor(seconds / 3600);
+            const mins = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function calculateProgress() {
+            const totalTasks = Object.keys(state.tasks).length;
+            const completedTasks = Object.values(state.tasks).filter(task => task.status === 'completed').length;
+            return totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+        }
+
+        function calculateIncome() {
+            return Object.values(state.books).reduce((total, book) => {
+                return total + (book.sales * book.price);
+            }, 0);
+        }
+
+        function getTotalDesigns() {
+            return Object.values(state.books).reduce((total, book) => total + book.designs, 0);
+        }
+
+        function getCompletedBooks() {
+            return Object.values(state.books).filter(book => book.designs === book.totalDesigns).length;
+        }
+
+        // Task management
+        function toggleTask(taskId) {
+            const task = state.tasks[taskId];
+            if (task) {
+                task.status = task.status === 'completed' ? 'pending' : 'completed';
+                
+                // Update book progress
+                if (task.bookId && task.designs > 0) {
+                    if (task.status === 'completed') {
+                        state.books[task.bookId].designs += task.designs;
+                    } else {
+                        state.books[task.bookId].designs = Math.max(0, state.books[task.bookId].designs - task.designs);
+                    }
+                }
+                
+                updateMetrics();
+                checkAchievements();
+                renderAll();
+                saveData();
+            }
+        }
+
+        // Timer functions
+        function toggleTimer() {
+            if (state.timer.isRunning) {
+                stopTimer();
+            } else {
+                startTimer();
+            }
+        }
+
+        function startTimer() {
+            state.timer.isRunning = true;
+            timerInterval = setInterval(() => {
+                state.timer.seconds++;
+                updateTimerDisplay();
+                
+                // Pomodoro logic
+                if (state.timer.pomodoroMode) {
+                    if (!state.timer.breakTime && state.timer.seconds >= 1500) { // 25 minutes
+                        state.timer.breakTime = true;
+                        state.timer.isRunning = false;
+                        clearInterval(timerInterval);
+                        showNotification('¡Tiempo de descanso! 5 minutos ☕');
+                    } else if (state.timer.breakTime && state.timer.seconds >= 300) { // 5 minutes
+                        state.timer.breakTime = false;
+                        state.timer.isRunning = false;
+                        clearInterval(timerInterval);
+                        showNotification('¡Vuelta al trabajo! 💪');
+                    }
+                }
+            }, 1000);
+            updateTimerDisplay();
+        }
+
+        function stopTimer() {
+            state.timer.isRunning = false;
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            updateTimerDisplay();
+        }
+
+        function resetTimer() {
+            stopTimer();
+            state.timer.seconds = 0;
+            state.timer.currentTask = null;
+            state.timer.pomodoroMode = false;
+            state.timer.breakTime = false;
+            updateTimerDisplay();
+        }
+
+        function startPomodoro() {
+            state.timer.pomodoroMode = true;
+            state.timer.breakTime = false;
+            state.timer.seconds = 0;
+            startTimer();
+        }
+
+        function updateTimerDisplay() {
+            const display = document.getElementById('timer-display');
+            const mode = document.getElementById('timer-mode');
+            const playBtn = document.getElementById('timer-play-btn');
+            
+            display.textContent = formatTime(state.timer.seconds);
+            
+            if (state.timer.pomodoroMode) {
+                if (state.timer.breakTime) {
+                    display.className = 'text-4xl md:text-5xl font-mono font-bold mb-4 text-green-500';
+                    mode.textContent = '☕ Tiempo de descanso (5 min)';
+                    mode.className = 'text-sm font-medium mb-2 text-green-600';
+                    mode.classList.remove('hidden');
+                } else {
+                    display.className = 'text-4xl md:text-5xl font-mono font-bold mb-4 text-orange-500';
+                    mode.textContent = '🍅 Modo Pomodoro (25 min)';
+                    mode.className = 'text-sm font-medium mb-2 text-orange-600';
+                    mode.classList.remove('hidden');
+                }
+            } else {
+                display.className = 'text-4xl md:text-5xl font-mono font-bold mb-4 text-purple-600';
+                mode.classList.add('hidden');
+            }
+            
+            // Update play/pause button
+            playBtn.innerHTML = state.timer.isRunning ? 
+                '<i data-lucide="pause" class="w-5 h-5"></i>' : 
+                '<i data-lucide="play" class="w-5 h-5"></i>';
+            
+            if (state.timer.isRunning) {
+                playBtn.className = 'bg-gradient-to-r from-red-500 to-pink-500 text-white p-3 rounded-full hover:scale-110 transition-all shadow-lg';
+            } else {
+                playBtn.className = 'bg-gradient-to-r from-green-500 to-emerald-500 text-white p-3 rounded-full hover:scale-110 transition-all shadow-lg';
+            }
+            
+            initializeLucideIcons();
+        }
+
+        // Achievement system
+        function checkAchievements() {
+            const completedTasks = Object.values(state.tasks).filter(task => task.status === 'completed').length;
+            const totalDesigns = getTotalDesigns();
+            const completedBooks = getCompletedBooks();
+            const totalIncome = calculateIncome();
+
+            let hasNewAchievement = false;
+
+            // Check achievements
+            if (completedTasks >= 1 && !state.achievements.find(a => a.id === 'first_task')?.unlocked) {
+                unlockAchievement('first_task');
+                hasNewAchievement = true;
+            }
+
+            if (totalDesigns >= 50 && !state.achievements.find(a => a.id === 'design_master')?.unlocked) {
+                unlockAchievement('design_master');
+                hasNewAchievement = true;
+            }
+
+            if (completedBooks >= 1 && !state.achievements.find(a => a.id === 'book_creator')?.unlocked) {
+                unlockAchievement('book_creator');
+                hasNewAchievement = true;
+            }
+
+            if (totalIncome >= 500 && !state.achievements.find(a => a.id === 'income_500')?.unlocked) {
+                unlockAchievement('income_500');
+                hasNewAchievement = true;
+            }
+
+            if (totalIncome >= 1000 && !state.achievements.find(a => a.id === 'income_1000')?.unlocked) {
+                unlockAchievement('income_1000');
+                hasNewAchievement = true;
+            }
+
+            if (completedBooks === 6 && !state.achievements.find(a => a.id === 'empire_builder')?.unlocked) {
+                unlockAchievement('empire_builder');
+                showCelebration();
+                hasNewAchievement = true;
+            }
+
+            if (hasNewAchievement) {
+                renderAchievements();
+            }
+        }
+
+        function unlockAchievement(achievementId) {
+            const achievement = state.achievements.find(a => a.id === achievementId);
+            if (achievement) {
+                achievement.unlocked = true;
+                showAchievementNotification(achievement);
+            }
+        }
+
+        function showAchievementNotification(achievement) {
+            const notification = document.getElementById('achievement-notification');
+            document.getElementById('achievement-name').textContent = achievement.name;
+            document.getElementById('achievement-description').textContent = achievement.description;
+            
+            notification.classList.remove('hidden');
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Metrics update
+        function updateMetrics() {
+            const completedTasks = Object.values(state.tasks).filter(task => task.status === 'completed').length;
+            state.metrics.totalDesigns = getTotalDesigns();
+            state.metrics.completedBooks = getCompletedBooks();
+            state.metrics.currentIncome = calculateIncome();
+            
+            // Update display
+            document.getElementById('progress-percentage').textContent = calculateProgress() + '%';
+            document.getElementById('progress-bar').style.width = calculateProgress() + '%';
+            document.getElementById('total-designs').textContent = state.metrics.totalDesigns;
+            document.getElementById('designs-percentage').textContent = `✨ '$'{Math.round(state.metrics.totalDesigns / 300 * 100)}% del total`;
+            document.getElementById('completed-books').textContent = state.metrics.completedBooks;
+            document.getElementById('total-income').textContent =  + Math.round(state.metrics.currentIncome);
+            
+            // Update stats
+            document.getElementById('current-streak').innerHTML = `<i data-lucide="flame" class="w-4 h-4 mr-1"></i>${state.metrics.streak} días`;
+            document.getElementById('total-hours').textContent = state.metrics.totalHours + 'h';
+            document.getElementById('avg-hours').textContent = state.metrics.totalHours > 0 ? (state.metrics.totalHours / Math.max(1, state.metrics.streak)).toFixed(1) + 'h' : '0h';
+            document.getElementById('designs-per-hour').textContent = state.metrics.totalHours > 0 ? (state.metrics.totalDesigns / state.metrics.totalHours).toFixed(1) : '0';
+            
+            initializeLucideIcons();
+        }
+
+        // Rendering functions
+        function renderAll() {
+            updateMetrics();
+            renderAchievements();
+            renderBooksSummary();
+            if (state.activeTab === 'schedule') renderSchedule();
+            if (state.activeTab === 'books') renderBooks();
+            renderIdeas();
+            renderFutureBooks();
+        }
+
+        function renderAchievements() {
+            const container = document.getElementById('achievements-grid');
+            container.innerHTML = state.achievements.map(achievement => `
+                <div class="p-4 rounded-lg text-center transition-all ${
+                    achievement.unlocked
+                        ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg scale-105'
+                        : 'bg-white/20 text-white/50'
+                }">
+                    <div class="text-2xl mb-2">${achievement.name.split(' ')[0]}</div>
+                    <div class="text-xs font-medium">${achievement.name.split(' ').slice(1).join(' ')}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderBooksSummary() {
+            const container = document.getElementById('books-summary');
+            container.innerHTML = Object.entries(state.books).map(([bookId, book]) => {
+                const progress = (book.designs / book.totalDesigns) * 100;
+                return `
+                    <div class="glass rounded-lg p-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-white font-semibold">${book.name}</span>
+                            <div class="flex items-center space-x-4">
+                                <span class="text-white/80 text-sm">${book.designs}/${book.totalDesigns}</span>
+                                <span class="text-green-400 font-bold">${(book.sales * book.price).toFixed(0)}</span>
+                            </div>
+                        </div>
+                        <div class="w-full bg-white/20 rounded-full h-3 overflow-hidden">
+                            <div class="bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 h-3 rounded-full transition-all duration-1000" style="width: ${progress}%"></div>
+                        </div>
+                        <div class="text-right text-xs text-cyan-300 font-medium mt-1">${Math.round(progress)}% completado</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderSchedule() {
+            const container = document.getElementById('schedule-container');
+            container.innerHTML = Object.entries(schedule).map(([dayNum, day]) => `
+                <div class="glass rounded-2xl p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="text-2xl font-bold text-white">${day.date}</h3>
+                            <p class="text-white/80 text-lg">${day.title}</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-white/80">
+                                <span class="text-2xl font-bold text-green-400">
+                                    ${day.tasks.filter(task => state.tasks[task.id]?.status === 'completed').length}
+                                </span>
+                                <span class="text-white/60"> / ${day.tasks.length}</span>
+                            </div>
+                            <div class="text-sm text-white/60">completadas</div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        ${day.tasks.map(task => renderTaskCard(state.tasks[task.id] || task, dayNum)).join('')}
+                    </div>
+                    
+                    ${renderNotesSection(dayNum)}
+                </div>
+            `).join('');
+            
+            initializeLucideIcons();
+        }
+
+        function renderTaskCard(task, dayNum) {
+            const isCompleted = task.status === 'completed';
+            const isTimerActive = state.timer.currentTask === task.id && state.timer.isRunning;
+            
+            return `
+                <div class="group relative p-6 rounded-2xl border backdrop-blur-lg transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl ${
+                    isCompleted 
+                        ? 'bg-gradient-to-br from-emerald-400/20 to-teal-500/20 border-emerald-300/50 shadow-emerald-500/20' 
+                        : 'bg-white/10 border-white/20 hover:border-purple-300/50 shadow-purple-500/10'
+                }">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-start space-x-4">
+                            <button
+                                onclick="toggleTask('${task.id}')"
+                                class="mt-1 transition-all duration-300 ${
+                                    isCompleted 
+                                        ? 'text-emerald-500 scale-110' 
+                                        : 'text-purple-400 hover:text-purple-600 hover:scale-110'
+                                }">
+                                <i data-lucide="${isCompleted ? 'check-circle' : 'circle'}" class="w-6 h-6"></i>
+                            </button>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-lg ${
+                                    isCompleted 
+                                        ? 'text-emerald-700 line-through' 
+                                        : 'text-gray-800'
+                                }">
+                                    ${task.name}
+                                </h4>
+                                <div class="flex items-center space-x-4 mt-3 text-sm">
+                                    <span class="flex items-center bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full">
+                                        <i data-lucide="clock" class="w-4 h-4 mr-1"></i>
+                                        ${task.duration}
+                                    </span>
+                                    ${task.designs > 0 ? `
+                                        <span class="bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-3 py-1 rounded-full font-medium">
+                                            ✨ ${task.designs} diseños
+                                        </span>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            ${isTimerActive ? `
+                                <div class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full font-mono text-sm animate-pulse">
+                                    ${formatTime(state.timer.seconds)}
+                                </div>
+                            ` : ''}
+                            ${task.status === 'pending' ? `
+                                <div class="flex space-x-2">
+                                    <button
+                                        onclick="startTaskTimer('${task.id}', false)"
+                                        class="bg-gradient-to-r from-green-500 to-emerald-500 text-white p-2 rounded-full hover:scale-110 transition-transform shadow-lg"
+                                        ${state.timer.isRunning && state.timer.currentTask !== task.id ? 'disabled' : ''}>
+                                        <i data-lucide="play" class="w-4 h-4"></i>
+                                    </button>
+                                    <button
+                                        onclick="startTaskTimer('${task.id}', true)"
+                                        class="bg-gradient-to-r from-orange-500 to-red-500 text-white p-2 rounded-full hover:scale-110 transition-transform shadow-lg"
+                                        ${state.timer.isRunning && state.timer.currentTask !== task.id ? 'disabled' : ''}
+                                        title="Pomodoro (25min)">
+                                        <i data-lucide="coffee" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderNotesSection(dayNum) {
+            const dayNotes = state.notes[dayNum] || '';
+            
+            return `
+                <div class="glass rounded-2xl p-4 mt-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-semibold text-gray-800 flex items-center">
+                            <i data-lucide="edit-3" class="w-4 h-4 mr-2 text-purple-500"></i>
+                            Notas del día
+                        </h4>
+                        <button
+                            onclick="toggleNoteEdit(${dayNum})"
+                            class="p-2 rounded-full transition-all bg-purple-500 text-white hover:bg-purple-600">
+                            <i data-lucide="edit-3" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <textarea
+                            id="notes-${dayNum}"
+                            onchange="saveNote(${dayNum}, this.value)"
+                            class="w-full p-3 border border-purple-300 rounded-lg resize-none h-24 focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white/80 backdrop-blur"
+                            placeholder="Escribe tus notas aquí...">${dayNotes}</textarea>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderBooks() {
+            const container = document.getElementById('books-container');
+            container.innerHTML = Object.entries(state.books).map(([bookId, book]) => {
+                const progress = (book.designs / book.totalDesigns) * 100;
+                const projectedIncome = (book.designs / book.totalDesigns) * book.target * book.price;
+                const realIncome = book.sales * book.price;
+                
+                return `
+                    <div class="group relative glass rounded-2xl p-6 hover:scale-[1.02] transition-all duration-500 hover:shadow-2xl">
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        
+                        <div class="relative">
+                            <div class="flex justify-between items-start mb-6">
+                                <h3 class="text-xl font-bold text-gray-800 group-hover:text-purple-700 transition-colors">${book.name}</h3>
+                                <span class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">${book.price}</span>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <div class="flex justify-between text-sm text-gray-600 mb-2">
+                                    <span class="font-medium">Progreso de diseños</span>
+                                    <span class="font-bold">${book.designs}/${book.totalDesigns}</span>
+                                </div>
+                                <div class="w-full bg-gray-200/50 rounded-full h-3 overflow-hidden">
+                                    <div class="bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 h-3 rounded-full transition-all duration-1000 relative" style="width: ${progress}%">
+                                        <div class="absolute inset-0 bg-white/30 animate-pulse rounded-full"></div>
+                                    </div>
+                                </div>
+                                <div class="text-right text-xs text-purple-600 font-medium mt-1">${Math.round(progress)}% completado</div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4 text-sm mb-4">
+                                <div class="bg-white/20 rounded-lg p-3">
+                                    <span class="text-gray-600 block">Meta ventas/mes:</span>
+                                    <div class="font-bold text-gray-800 text-lg">${book.target}</div>
+                                </div>
+                                <div class="bg-white/20 rounded-lg p-3">
+                                    <span class="text-gray-600 block">Proyección:</span>
+                                    <div class="font-bold text-purple-600 text-lg">${projectedIncome.toFixed(0)}/mes</div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white/30 rounded-lg p-3">
+                                <label class="text-gray-600 text-sm block mb-1">Ventas reales:</label>
+                                <div class="flex items-center space-x-2">
+                                    <input
+                                        type="number"
+                                        value="${book.sales || ''}"
+                                        onchange="updateBookSales('${bookId}', this.value)"
+                                        class="w-20 px-2 py-1 rounded border border-gray-300 text-sm"
+                                        placeholder="0">
+                                    <span class="text-sm text-gray-600">× ${book.price} = </span>
+                                    <span class="font-bold text-green-600">${realIncome.toFixed(2)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderIdeas() {
+            const container = document.getElementById('ideas-list');
+            if (container) {
+                container.innerHTML = state.ideaBank.map((idea, index) => `
+                    <div class="flex items-center justify-between bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg border border-purple-200">
+                        <span class="text-gray-800">${idea}</span>
+                        <button
+                            onclick="removeIdea(${index})"
+                            class="text-red-500 hover:text-red-700 hover:scale-110 transition-all">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `).join('');
+                
+                initializeLucideIcons();
+            }
+        }
+
+        function renderFutureBooks() {
+            const container = document.getElementById('future-books-list');
+            if (container) {
+                container.innerHTML = state.futureBooks.map((book) => `
+                    <div class="bg-white p-3 rounded border border-purple-200">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-semibold text-purple-800">${book.title}</h4>
+                            <button
+                                onclick="removeFutureBook(${book.id})"
+                                class="text-red-500 hover:text-red-700">
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <div>📅 ${book.date}</div>
+                            <div>🎨 ${book.niche}</div>
+                            <div class="mt-1">${book.description}</div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                initializeLucideIcons();
+            }
+        }
+
+        // Event handlers
+        function startTaskTimer(taskId, pomodoroMode) {
+            state.timer.currentTask = taskId;
+            state.timer.pomodoroMode = pomodoroMode;
+            state.timer.breakTime = false;
+            state.timer.seconds = 0;
+            startTimer();
+            
+            // Update display
+            const currentTaskDisplay = document.getElementById('current-task-display');
+            const currentTaskName = document.getElementById('current-task-name');
+            if (currentTaskDisplay && currentTaskName) {
+                currentTaskName.textContent = state.tasks[taskId]?.name || 'Tarea desconocida';
+                currentTaskDisplay.classList.remove('hidden');
+            }
+        }
+
+        function saveNote(dayNum, value) {
+            state.notes[dayNum] = value;
+            saveData();
+        }
+
+        function toggleNoteEdit(dayNum) {
+            // This function can be expanded for more sophisticated note editing
+            console.log('Toggle note edit for day', dayNum);
+        }
+
+        function updateBookSales(bookId, sales) {
+            state.books[bookId].sales = parseInt(sales) || 0;
+            updateMetrics();
+            checkAchievements();
+            renderAll();
+            saveData();
+        }
+
+        // Modal functions
+        function showIdeaModal() {
+            document.getElementById('idea-modal').classList.remove('hidden');
+            renderIdeas();
+        }
+
+        function hideIdeaModal() {
+            document.getElementById('idea-modal').classList.add('hidden');
+        }
+
+        function showCalendarModal() {
+            document.getElementById('calendar-modal').classList.remove('hidden');
+            renderFutureBooks();
+        }
+
+        function hideCalendarModal() {
+            document.getElementById('calendar-modal').classList.add('hidden');
+        }
+
+        function showCelebration() {
+            document.getElementById('celebration-modal').classList.remove('hidden');
+        }
+
+        function hideCelebration() {
+            document.getElementById('celebration-modal').classList.add('hidden');
+        }
+
+        // Idea Bank functions
+        function addIdea() {
+            const input = document.getElementById('new-idea-input');
+            const newIdea = input.value.trim();
+            if (newIdea) {
+                state.ideaBank.push(newIdea);
+                input.value = '';
+                renderIdeas();
+                saveData();
+            }
+        }
+
+        function removeIdea(index) {
+            state.ideaBank.splice(index, 1);
+            renderIdeas();
+            saveData();
+        }
+
+        // Future Books functions
+        function addFutureBook() {
+            const title = document.getElementById('future-book-title').value.trim();
+            const date = document.getElementById('future-book-date').value;
+            const niche = document.getElementById('future-book-niche').value.trim();
+            const description = document.getElementById('future-book-description').value.trim();
+            
+            if (title) {
+                const newBook = {
+                    id: Date.now(),
+                    title,
+                    date,
+                    niche,
+                    description
+                };
+                state.futureBooks.push(newBook);
+                
+                // Clear form
+                document.getElementById('future-book-title').value = '';
+                document.getElementById('future-book-date').value = '';
+                document.getElementById('future-book-niche').value = '';
+                document.getElementById('future-book-description').value = '';
+                
+                renderFutureBooks();
+                saveData();
+            }
+        }
+
+        function removeFutureBook(id) {
+            state.futureBooks = state.futureBooks.filter(book => book.id !== id);
+            renderFutureBooks();
+            saveData();
+        }
+
+        // Utility functions
+        function showNotification(message) {
+            // Simple notification - can be enhanced
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('Kawaii Books Empire', {
+                    body: message,
+                    icon: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTYiIGZpbGw9IiM4YjVjZjYiLz4KPHRLEHT4eT0iMTgiIGZpbGw9IndoaXRlIiBmb250LXNpemU9IjI4Ij7wn46YPC90ZXh0Pgo8L3N2Zz4K'
+                });
+            } else {
+                alert(message);
+            }
+        }
+
+        // PWA Setup
+        function setupPWA() {
+            let deferredPrompt;
+            const installButton = document.getElementById('install-button');
+
+            // Create dynamic manifest
+            const manifestData = {
+                name: "Kawaii Books Empire",
+                short_name: "Kawaii Books",
+                start_url: "./",
+                display: "standalone",
+                background_color: "#8b5cf6",
+                theme_color: "#8b5cf6",
+                icons: [
+                    {
+                        src: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iMTI4IiBmaWxsPSIjOGI1Y2Y2Ii8+Cjx0ZXh0IHg9IjI1NiIgeT0iMzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSIgZm9udC1zaXplPSIyMDAiPvCfjonipKA8L3RleHQ+Cjwvc3ZnPgo=",
+                        sizes: "512x512",
+                        type: "image/svg+xml"
+                    }
+                ]
+            };
+
+            const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+            const manifestURL = URL.createObjectURL(manifestBlob);
+            document.getElementById('manifest-placeholder').href = manifestURL;
+
+            // Request notification permission
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                installButton.classList.remove('hidden');
+            });
+
+            installButton.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                        installButton.classList.add('hidden');
+                    }
+                    deferredPrompt = null;
+                }
+            });
+
+            // Simple service worker registration
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    self.addEventListener('install', event => {
+                        self.skipWaiting();
+                    });
+                    
+                    self.addEventListener('activate', event => {
+                        event.waitUntil(self.clients.claim());
+                    });
+                    
+                    self.addEventListener('fetch', event => {
+                        // Simple pass-through for now
+                        event.respondWith(fetch(event.request));
+                    });
+                `;
+                
+                const swBlob = new Blob([swCode], { type: 'application/javascript' });
+                const swURL = URL.createObjectURL(swBlob);
+                
+                navigator.serviceWorker.register(swURL).catch(console.error);
+            }
+        }
+
+        // Event listeners for Enter key
+        document.addEventListener('DOMContentLoaded', () => {
+            initApp();
+            
+            // Add Enter key listener for idea input
+            const ideaInput = document.getElementById('new-idea-input');
+            if (ideaInput) {
+                ideaInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        addIdea();
+                    }
+                });
+            }
+        });
+
+        // Initialize app when DOM is loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initApp);
+        } else {
+            initApp();
+        }
+    </script>
+</body>
+</html>
